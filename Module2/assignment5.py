@@ -3,15 +3,15 @@ import numpy as np
 
 
 #
-# TODO:
 # Load up the dataset, setting correct header labels.
 #
-# .. your code here ..
+df = pd.read_csv('Module2/Datasets/census.data',
+                 names=['education', 'age', 'capital-gain', 'race',
+                        'capital-loss', 'hours-per-week', 'sex', 'classification'])
 
 
 
 #
-# TODO:
 # Use basic pandas commands to look through the dataset... get a
 # feel for it before proceeding! Do the data-types of each column
 # reflect the values you see when you look through the data using
@@ -24,11 +24,12 @@ import numpy as np
 # na_values when loading the dataframe.
 #
 # .. your code here ..
-
+print(df.head())
+print(df.dtypes)
+df[df == 0] = np.nan
 
 
 #
-# TODO:
 # Look through your data and identify any potential categorical
 # features. Ensure you properly encode any ordinal and nominal
 # types using the methods discussed in the chapter.
@@ -38,14 +39,18 @@ import numpy as np
 # make more sense to have a numeric type or a series of categories
 # for these somewhat ambigious features?
 #
-# .. your code here ..
+education_ordered = ['Preschool', '1st-4th', '5th-6th', '7th-8th', '9th',
+                     '10th', '11th', '12th', 'HS-grad', 'Some-college',
+                     'Bachelors', 'Masters', 'Doctorate']
 
+df.education = df.education.astype("category", ordered=True,
+                                   categories=education_ordered).cat.codes
+
+df = pd.get_dummies(df, columns=['race', 'sex', 'classification'])
 
 
 #
-# TODO:
 # Print out your dataframe
-#
-# .. your code here ..
+print(df)
 
 
