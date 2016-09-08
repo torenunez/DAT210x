@@ -14,13 +14,13 @@ wheat = pd.read_csv('Datasets/wheat.data')
 #
 # Drop the 'id' feature
 # 
-wheat = wheat.drop (labels = ['id'], axis = 1)
+wheat = wheat.drop(labels = ['id'], axis = 1)
 
 
 #
 # Compute the correlation matrix of your dataframe
 # 
-wheat.corr ()
+wheat.corr()
 
 
 #
