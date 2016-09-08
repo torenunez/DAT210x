@@ -5,25 +5,28 @@ import matplotlib
 # Look pretty...
 matplotlib.style.use('ggplot')
 
+import os
+os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module3')
+
 #
-# TODO: Load up the Seeds Dataset into a Dataframe
+# Load up the Seeds Dataset into a Dataframe
 # It's located at 'Datasets/wheat.data'
 # 
-# .. your code here ..
+wheat = pd.read_csv('./Datasets/wheat.data')
 
 
 #
-# TODO: Create a slice of your dataframe (call it s1)
+# Create a slice of your dataframe (call it s1)
 # that only includes the 'area' and 'perimeter' features
 # 
-# .. your code here ..
+s1 = pd.concat([wheat.area, wheat.perimeter], axis=1)
 
 
 #
-# TODO: Create another slice of your dataframe (call it s2)
+# Create another slice of your dataframe (call it s2)
 # that only includes the 'groove' and 'asymmetry' features
 # 
-# .. your code here ..
+s2 = pd.concat([wheat.groove, wheat.asymmetry], axis = 1)
 
 
 #
@@ -31,7 +34,8 @@ matplotlib.style.use('ggplot')
 # and another histogram plot using the second slice.
 # Be sure to set alpha=0.75
 # 
-# .. your code here ..
+s1.plot.hist(alpha=0.75)
+s2.plot.hist(alpha=0.75)
 
 
 plt.show()
