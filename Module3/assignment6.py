@@ -28,11 +28,8 @@ wheat.corr()
 # 
 plt.imshow(wheat.corr(), cmap=plt.cm.Blues, interpolation='nearest')
 plt.colorbar()
-tick_marks = [i for i in range (len(wheat.columns))]
+tick_marks = [i for i in range(len(wheat.columns))]
 plt.xticks(tick_marks, wheat.columns, rotation='vertical')
 plt.yticks(tick_marks, wheat.columns)
 
 plt.show()
-
-
-

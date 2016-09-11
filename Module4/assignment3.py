@@ -22,7 +22,7 @@ scaleFeatures = True
 # by now ;-)
 #
 df = pd.read_csv('Datasets/kidney_disease.csv')
-df.dropna(axis = 0, how = 'any', inplace = True)
+
 
 
 
@@ -33,9 +33,10 @@ labels = ['red' if i=='ckd' else 'green' for i in df.classification]
 
 
 # Use an indexer to select only the following columns:
-#       ['bgr','wc','rc']
-#.
-df = df[['bgr', 'wc', 'rc']]
+dummies =pd.get_dummies(df[['rbc', 'pc', 'pcc', 'ba', 'htn', 'dm', 'cad', 'appet', 'pe', 'ane']])
+df.drop(labels = ['id', 'classification', 'rbc', 'pc', 'pcc', 'ba', 'htn', 'dm', 'cad', 'appet', 'pe', 'ane'], axis = 1, inplace = True)
+
+df = pd.concat([df, dummies], axis=1)
 
 
 # Print out and check your dataframe's dtypes. You'll probably
@@ -51,13 +52,8 @@ df = df[['bgr', 'wc', 'rc']]
 #
 print df
 print df.dtypes 	# The columns are all of type "object"
-df.bgr = pd.to_numeric(df.bgr)
-df.wc = pd.to_numeric(df.wc)
-df.rc = pd.to_numeric(df.rc)
-print df
-print df.dtypes
 
-
+df.dropna(axis = 0, how = 'any', inplace = True)
 
 # PCA Operates based on variance. The variable with the greatest
 # variance will dominate. Go ahead and peek into your data using a
