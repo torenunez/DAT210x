@@ -62,7 +62,7 @@ Plot2D(T, "PCA transformed data", 1, 2, num_to_plot = 40)
 # the first two components.
 #
 from sklearn import manifold
-iso = manifold.Isomap(n_neighbors = 8, n_components = 3)
+iso = manifold.Isomap(n_neighbors = 3, n_components = 3)
 T2 = iso.fit_transform(df)
 Plot2D(T2, "Isomap transformed data", 1, 2, num_to_plot = 40)
 
