@@ -5,6 +5,9 @@ import matplotlib
 
 matplotlib.style.use('ggplot') # Look Pretty
 
+import os
+os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
+
 def showandtell(title=None):
   if title != None: plt.savefig(title + ".png", bbox_inches='tight', dpi=300)
   plt.show()
@@ -19,30 +22,33 @@ def showandtell(title=None):
 
 
 #
-# TODO: Load up the dataset and take a peek at its head
+# Load up the dataset and take a peek at its head
 # Convert the date using pd.to_datetime, and the time using pd.to_timedelta
 #
-# .. your code here ..
+df = pd.read_csv('Datasets/CDR.csv')
+print df.head()
+df.CallDate = pd.to_datetime(df.CallDate)
+df.Duration = pd.to_timedelta(df.Duration)
 
 
 #
-# TODO: Get a distinct list of "In" phone numbers (users) and store the values in a
+# Get a distinct list of "In" phone numbers (users) and store the values in a
 # regular python list.
 # Hint: https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tolist.html
 #
-# .. your code here ..
+in_numbers = list(df.In.unique())
 
 
 # 
-# TODO: Create a slice called user1 that filters to only include dataset records where the
+# Create a slice called user1 that filters to only include dataset records where the
 # "In" feature (user phone number) is equal to the first number on your unique list above
 #
-# .. your code here ..
+user1 = df[(df.In == in_numbers[0])]
 
 
 # INFO: Plot all the call locations
 user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call Locations')
-showandtell()  # Comment this line out when you're ready to proceed
+#showandtell()  # Comment this line out when you're ready to proceed
 
 
 #
@@ -50,7 +56,7 @@ showandtell()  # Comment this line out when you're ready to proceed
 # is where domain expertise comes into play. Your intuition tells you that people are likely
 # to behave differently on weekends:
 #
-# On Weekdays:
+# On Weekends:
 #   1. People probably don't go into work
 #   2. They probably sleep in late on Saturday
 #   3. They probably run a bunch of random errands, since they couldn't during the week
@@ -62,23 +68,23 @@ showandtell()  # Comment this line out when you're ready to proceed
 #   3. They probably spend time commuting between work and home everyday
 
 
-
 #
-# TODO: Add more filters to the user1 slice you created. Add bitwise logic so that you're
+# Add more filters to the user1 slice you created. Add bitwise logic so that you're
 # only examining records that came in on weekends (sat/sun).
 #
-# .. your code here ..
+user1 = user1[(user1.DOW == 'Sat') | (user1.DOW == 'Sun')]
 
 
 #
-# TODO: Further filter it down for calls that are came in either before 6AM OR after 10pm (22:00:00).
+# Further filter it down for calls that are came in either before 6AM OR after 10pm (22:00:00).
 # You can use < and > to compare the string times, just make sure you code them as military time
 # strings, eg: "06:00:00", "22:00:00": https://en.wikipedia.org/wiki/24-hour_clock
 #
 # You might also want to review the Data Manipulation section for this. Once you have your filtered
 # slice, print out its length:
 #
-# .. your code here ..
+user1 = user1[(user1.CallTime < "06:00:00") | (user1.CallTime > "22:00:00")]
+print len(user1)
 
 
 #
@@ -95,12 +101,12 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(user1.TowerLon,user1.TowerLat, c='g', marker='o', alpha=0.2)
 ax.set_title('Weekend Calls (<6am or >10p)')
-showandtell()  # TODO: Comment this line out when you're ready to proceed
+#showandtell()  # TODO: Comment this line out when you're ready to proceed
 
 
 
 #
-# TODO: Run K-Means with a K=1. There really should only be a single area of concentration. If you
+# Run K-Means with a K=1. There really should only be a single area of concentration. If you
 # notice multiple areas that are "hot" (multiple areas the usr spends a lot of time at that are FAR
 # apart from one another), then increase K=2, with the goal being that one of the centroids will
 # sweep up the annoying outliers; and the other will zero in on the user's approximate home location.
@@ -113,16 +119,43 @@ showandtell()  # TODO: Comment this line out when you're ready to proceed
 #
 # Hint: Make sure you graph the CORRECT coordinates. This is part of your domain expertise.
 #
-# .. your code here ..
+from sklearn.cluster import KMeans
+
+kmeans = KMeans(n_clusters = 2)
+user1 = pd.concat([user1.TowerLon, user1.TowerLat], axis = 1)
+labels = kmeans.fit_predict(user1)
+
+centroids = kmeans.cluster_centers_
+ax.scatter(x = centroids[:, 0], y = centroids[:, 1], c = 'r', marker = 'x', s = 100)
 
 
-showandtell()  # TODO: Comment this line out when you're ready to proceed
+#showandtell()  # TODO: Comment this line out when you're ready to proceed
 
 
 
 #
-# TODO: Repeat the above steps for all 10 individuals, being sure to record their approximate home
+# Repeat the above steps for all 10 individuals, being sure to record their approximate home
 # locations. You might want to use a for-loop, unless you enjoy typing.
 #
-# .. your code here ..
+locations = []
+for i in range(len(in_numbers)):
 
+  user = df[(df.In == in_numbers[i])]
+
+  user.plot.scatter(x='TowerLon', y='TowerLat', c='purple', alpha=0.12, title='Call Locations', s = 30)
+
+  user = user[(user.DOW == 'Sat') | (user.DOW == 'Sun')]
+  user = user[(user.CallTime < "06:00:00") | (user.CallTime > "22:00:00")]
+
+  fig = plt.figure()
+  ax = fig.add_subplot(111)
+  ax.scatter(user.TowerLon, user.TowerLat, c='g', marker='o', alpha=0.2)
+  ax.set_title('Weekend Calls (<6am or >10p)')
+
+  kmeans = KMeans(n_clusters = 2)
+  user = pd.concat([user.TowerLon, user.TowerLat], axis = 1)
+  labels = kmeans.fit_predict(user)
+
+  centroids = kmeans.cluster_centers_
+  ax.scatter(x = centroids[:, 0], y = centroids[:, 1], c = 'r', marker = 'x', s = 100)
+  locations.append(centroids)
