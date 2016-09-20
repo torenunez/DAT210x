@@ -5,9 +5,12 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import matplotlib
 
+import os
+os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
+#
 
 #
-# TODO: Parameters to play around with
+# Parameters to play around with
 PLOT_TYPE_TEXT = False    # If you'd like to see indices
 PLOT_VECTORS = True       # If you'd like to see your original features in P.C.-Space
 
@@ -56,37 +59,39 @@ def doPCA(data, dimensions=2):
 
 def doKMeans(data, clusters=0):
   #
-  # TODO: Do the KMeans clustering here, passing in the # of clusters parameter
+  # Do the KMeans clustering here, passing in the # of clusters parameter
   # and fit it against your data. Then, return a tuple containing the cluster
   # centers and the labels
   #
-  # .. your code here ..
+  model = KMeans(n_clusters = clusters)
+  labels = model.fit_predict(data)
   return model.cluster_centers_, model.labels_
 
 
 #
-# TODO: Load up the dataset. It has may or may not have nans in it. Make
+# Load up the dataset. It has may or may not have nans in it. Make
 # sure you catch them and destroy them, by setting them to '0'. This is valid
 # for this dataset, since if the value is missing, you can assume no $ was spent
 # on it.
 #
-# .. your code here ..
+df = pd.read_csv('Datasets/Wholesale customers data.csv')
+print df.isnull().sum()
 
 #
-# TODO: As instructed, get rid of the 'Channel' and 'Region' columns, since
+# As instructed, get rid of the 'Channel' and 'Region' columns, since
 # you'll be investigating as if this were a single location wholesaler, rather
 # than a national / international one. Leaving these fields in here would cause
 # KMeans to examine and give weight to them.
 #
-# .. your code here ..
-
+df.drop(labels = ['Channel', 'Region'], axis = 1, inplace = True)
 
 #
-# TODO: Before unitizing / standardizing / normalizing your data in preparation for
+# Before unitizing / standardizing / normalizing your data in preparation for
 # K-Means, it's a good idea to get a quick peek at it. You can do this using the
 # .describe() method, or even by using the built-in pandas df.plot.hist()
 #
-# .. your code here ..
+print df.describe()
+df.plot.hist()
 
 
 #
@@ -170,13 +175,13 @@ print df.describe()
 
 
 #
-# TODO: Un-comment just ***ONE*** of lines at a time and see how alters your results
+# Un-comment just ***ONE*** of lines at a time and see how alters your results
 # Pay attention to the direction of the arrows, as well as their LENGTHS
 #T = preprocessing.StandardScaler().fit_transform(df)
 #T = preprocessing.MinMaxScaler().fit_transform(df)
 #T = preprocessing.MaxAbsScaler().fit_transform(df)
-#T = preprocessing.Normalizer().fit_transform(df)
-T = df # No Change
+T = preprocessing.Normalizer().fit_transform(df)
+#T = df # No Change
 
 
 #
@@ -195,11 +200,10 @@ centroids, labels = doKMeans(T, n_clusters)
 
 
 #
-# TODO: Print out your centroids. They're currently in feature-space, which
+# Print out your centroids. They're currently in feature-space, which
 # is good. Print them out before you transform them into PCA space for viewing
 #
-# .. your code here ..
-
+print centroids
 
 # Do PCA *after* to visualize the results. Project the centroids as well as 
 # the samples into the new 2D feature space for visualization purposes.
