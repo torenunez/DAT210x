@@ -1,14 +1,16 @@
 import pandas as pd
 from datetime import timedelta
+from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import matplotlib
 
 matplotlib.style.use('ggplot') # Look Pretty
 
+import os
+os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
 #
 # INFO: This dataset has call records for 10 users tracked over the course of 3 years.
 # Your job is to find out where the users likely live at!
-
 
 
 def showandtell(title=None):
@@ -39,7 +41,7 @@ def clusterWithFewestSamples(model):
 
 def doKMeans(data, clusters=0):
   #
-  # TODO: Be sure to only feed in Lat and Lon coordinates to the KMeans algo, since none of the other
+  # Be sure to only feed in Lat and Lon coordinates to the KMeans algo, since none of the other
   # data is suitable for your purposes. Since both Lat and Lon are (approximately) on the same scale,
   # no feature scaling is required. Print out the centroid locations and add them onto your scatter
   # plot. Use a distinguishable marker and color.
@@ -47,28 +49,39 @@ def doKMeans(data, clusters=0):
   # Hint: Make sure you fit ONLY the coordinates, and in the CORRECT order (lat first).
   # This is part of your domain expertise.
   #
-  # .. your code here ..
+  df = pd.concat([data.TowerLon, data.TowerLat], axis = 1)
+  kmeans = KMeans(n_clusters = clusters)
+  labels = kmeans.fit_predict(df)
+  centroids = kmeans.cluster_centers_
+  ax.scatter(x = centroids[:, 0], y = centroids[:, 1], c = 'r', marker = 'x', s = 100)
+  model = kmeans
   return model
 
 
 
 #
-# TODO: Load up the dataset and take a peek at its head and dtypes.
+# Load up the dataset and take a peek at its head and dtypes.
 # Convert the date using pd.to_datetime, and the time using pd.to_timedelta
 #
-# .. your code here ..
+df = pd.read_csv('Datasets/CDR.csv')
+print df.head()
+print df.dtypes
+df.CallDate = pd.to_datetime(df.CallDate)
+df.Duration = pd.to_timedelta(df.Duration)
+df.CallTime = pd.to_timedelta(df.CallTime)
+print df.dtypes
 
 
 
 
 
 #
-# TODO: Get a distinct list of "In" phone numbers (users) and store the values in a
+# Get a distinct list of "In" phone numbers (users) and store the values in a
 # regular python list.
 # Hint: https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tolist.html
 #
-# .. your code here ..
-
+users = df.In.unique()
+print users
 
 #
 # INFO: The locations map above should be too "busy" to really wrap your head around. This
@@ -89,33 +102,36 @@ def doKMeans(data, clusters=0):
 
 
 
-print "\n\nExamining person: ", 0
+print "\n\nExamining person: ", 8
 # 
-# TODO: Create a slice called user1 that filters to only include dataset records where the
+# Create a slice called user1 that filters to only include dataset records where the
 # "In" feature (user phone number) is equal to the first number on your unique list above
 #
-# .. your code here ..
+user1 = df[(df.In == users[8])]
 
 
 #
-# TODO: Alter your slice so that it includes only Weekday (Mon-Fri) values.
+# Alter your slice so that it includes only Weekday (Mon-Fri) values.
 #
-# .. your code here ..
+user1 = user1[user1.DOW.isin(['Mon', 'Tue', 'Wed', 'Thu','Fri'])]
 
 
 #
-# TODO: The idea is that the call was placed before 5pm. From Midnight-730a, the user is
+# The idea is that the call was placed before 5pm. From Midnight-730a, the user is
 # probably sleeping and won't call / wake up to take a call. There should be a brief time
 # in the morning during their commute to work, then they'll spend the entire day at work.
 # So the assumption is that most of the time is spent either at work, or in 2nd, at home.
 #
-# .. your code here ..
+user1 = user1[(user1.CallTime < "17:00:00")]
 
 
 #
-# TODO: Plot the Cell Towers the user connected to
+# Plot the Cell Towers the user connected to
 #
-# .. your code here ..
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.scatter(user1.TowerLon,user1.TowerLat, c='g', marker='o', alpha=0.2)
+ax.set_title('Weekday Calls before 5PM')
 
 
 
@@ -139,6 +155,8 @@ midWayClusterIndices = clusterWithFewestSamples(model)
 midWaySamples = user1[midWayClusterIndices]
 print "    Its Waypoint Time: ", midWaySamples.CallTime.mean()
 
+print model.cluster_centers_
+
 
 #
 # Let's visualize the results!
@@ -146,4 +164,4 @@ print "    Its Waypoint Time: ", midWaySamples.CallTime.mean()
 ax.scatter(model.cluster_centers_[:,1], model.cluster_centers_[:,0], s=169, c='r', marker='x', alpha=0.8, linewidths=2)
 #
 # Then save the results:
-showandtell('Weekday Calls Centroids')  # Comment this line out when you're ready to proceed
+#showandtell('Weekday Calls Centroids')  # Comment this line out when you're ready to proceed
