@@ -10,8 +10,11 @@ import matplotlib.pyplot as plt
 # as the dimensionality reduction technique:
 Test_PCA = False
 
+import matplotlib
 matplotlib.style.use('ggplot') # Look Pretty
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module5')
 
 def Plot2DBoundary(DTrain, LTrain, DTest, LTest):
   # The dots are training samples (img not drawn), and the pics are testing samples (images drawn)
@@ -92,27 +95,42 @@ def Plot2DBoundary(DTrain, LTrain, DTest, LTest):
 
 
 #
-# TODO: Use the same code from Module4/assignment4.py to load up the
+# Use the same code from Module4/assignment4.py to load up the
 # face_data.mat in a dataset called "df". Be sure to calculate the
 # num_pixels value, and to rotate the images to being right-side-up
 # instead of sideways. This was demonstrated in the M4/A4 code:
 #
-# .. your code here ..
+mat = scipy.io.loadmat('Datasets/face_data.mat')
+df = pd.DataFrame(mat['images']).T
+num_images, num_pixels = df.shape
+num_pixels = int(math.sqrt(num_pixels))
+
+# Rotate the pictures, so we don't have to crane our necks:
+for i in range(num_images):
+  df.loc[i,:] = df.loc[i,:].reshape(num_pixels, num_pixels).T.reshape(-1)
 
 
 #
-# TODO: Load up your face_labels dataset. It only has a single column, and
+# Load up your face_labels dataset. It only has a single column, and
 # you're only interested in that single column. You will have to slice the 
 # column out so that you have access to it as a "Series" rather than as a
 # "Dataframe". Use an appropriate indexer to take care of that. Also print
 # out the labels and compare to the face_labels.csv file to ensure you
 # loaded it correctly
 #
-# .. your code here ..
+label = pd.read_csv('Datasets/face_labels.csv')
+label = label.iloc[:, 0]
+print type(label)
+#print label.head()
+print "Length of label series is:", len(label)
+print "Length of data frame is:", len(df)
+# Lengths of the dataframe (df) and the label series do not match - 698 and 697, respectively. Let's remove the first row of df.
+print df.head(7)
+df.drop(df.index[:1], inplace = True)
 
 
 #
-# TODO: Do train_test_split. Use the same code as on the EdX platform in the
+# Do train_test_split. Use the same code as on the EdX platform in the
 # reading material, but set the random_state=7 for reproduceability, and play
 # around with the test_size from 0.10 - 0.20 (10-20%). Your labels are actually
 # passed in as a series (instead of as an NDArray) so that you can access
@@ -120,8 +138,8 @@ def Plot2DBoundary(DTrain, LTrain, DTest, LTest):
 # in the original dataframe, which you will use to plot your testing data as images
 # rather than as points:
 #
-# .. your code here ..
-
+from sklearn.cross_validation import train_test_split
+data_train, data_test, label_train, label_test = train_test_split(df, label, test_size = 0.1, random_state = 7)
 
 
 if Test_PCA:
@@ -139,11 +157,13 @@ if Test_PCA:
 
   #
   #
-  # TODO: Implement PCA here. ONLY train against your training data, but
+  # Implement PCA here. ONLY train against your training data, but
   # transform both your training + test data, storing the results back into
   # data_train, and data_test.
   #
-  # .. your code here ..
+  pca = PCA(n_components=2)
+  data_train = pca.fit_transform(data_train)
+  data_test = pca.fit_transform(data_test)
 
 else:
   # INFO: Isomap is used *before* KNeighbors to simplify your high dimensionality
@@ -161,23 +181,25 @@ else:
   # and data_test from their original high-D image feature space, down to 2D
 
   #
-  # TODO: Implement Isomap here. ONLY train against your training data, but
+  # Implement Isomap here. ONLY train against your training data, but
   # transform both your training + test data, storing the results back into
   # data_train, and data_test.
-  #
-  # .. your code here ..
 
-
-
+  from sklearn import manifold
+  iso = manifold.Isomap(n_neighbors=6, n_components=2)
+  data_train = iso.fit_transform(data_train)
+  data_test = iso.fit_transform(data_test)
 
 #
-# TODO: Implement KNeighborsClassifier here. You can use any K value from 1
+# Implement KNeighborsClassifier here. You can use any K value from 1
 # through 20, so play around with it and attempt to get good accuracy.
 # This is the heart of this assignment: Looking at the 2D points that
 # represent your images, along with a list of "answers" or correct class
 # labels that those 2d representations should be.
 #
-# .. your code here ..
+from sklearn.neighbors import KNeighborsClassifier
+model = KNeighborsClassifier(n_neighbors = 5)
+model.fit(data_train, label_train)
 
 # NOTE: K-NEIGHBORS DOES NOT CARE WHAT THE ANSWERS SHOULD BE! In fact, it
 # just tosses that information away. All KNeighbors cares about storing is
@@ -187,10 +209,10 @@ else:
 
 
 #
-# TODO: Calculate + Print the accuracy of the testing set (data_test and
+# Calculate + Print the accuracy of the testing set (data_test and
 # label_test).
 #
-# .. your code here ..
+print model.score(data_test, label_test)
 
 
 
