@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.style.use('ggplot') # Look Pretty
 
 import os
-os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module5')
 
 
 def plotDecisionBoundary(model, X, y):
@@ -56,8 +56,8 @@ def plotDecisionBoundary(model, X, y):
 #
 X = pd.read_csv('Datasets/wheat.data')
 print X.head()
-
-
+X.drop(labels = ['id'], axis = 1, inplace = True)
+print X.head()
 
 #
 # Copy the 'wheat_type' series slice out of X, and into a series
