@@ -161,6 +161,7 @@ if Test_PCA:
   # transform both your training + test data, storing the results back into
   # data_train, and data_test.
   #
+  from sklearn.decomposition import PCA
   pca = PCA(n_components=2)
   data_train = pca.fit_transform(data_train)
   data_test = pca.fit_transform(data_test)

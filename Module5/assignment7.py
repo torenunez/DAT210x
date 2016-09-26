@@ -2,6 +2,8 @@
 # as the dimensionality reduction technique:
 Test_PCA = True
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module5')
 
 def plotDecisionBoundary(model, X, y):
   print "Plotting..."
@@ -54,42 +56,51 @@ def plotDecisionBoundary(model, X, y):
 
 
 # 
-# TODO: Load in the dataset, identify nans, and set proper headers.
+# Load in the dataset, identify nans, and set proper headers.
 # Be sure to verify the rows line up by looking at the file in a text editor.
 #
-# .. your code here ..
-
+import pandas as pd
+X = pd.read_csv('Datasets/breast-cancer-wisconsin.data', names = ['sample', 'thickness', 'size', 'shape', 'adhesion', 'epithelial', 'nuclei', 'chromatin', 'nucleoli', 'mitoses', 'status'])
+print X.head()
+print X.dtypes
+X.nuclei = pd.to_numeric(X.nuclei, errors = 'coerce')
+print X.isnull().sum()
+print X.nuclei.unique()
+print X.head()
 
 # 
-# TODO: Copy out the status column into a slice, then drop it from the main
+# Copy out the status column into a slice, then drop it from the main
 # dataframe. You can also drop the sample column, since that doesn't provide
 # us with any machine learning power.
 #
-# .. your code here ..
+y = X.status
+X.drop(labels = ['sample', 'status'], axis = 1, inplace = True)
 
 
 #
-# TODO: With the labels safely extracted from the dataset, replace any nan values
+# With the labels safely extracted from the dataset, replace any nan values
 # with the mean feature / column value
 #
-# .. your code here ..
+X = X.fillna(X.mean())
 
 
 #
-# TODO: Experiment with the basic SKLearn preprocessing scalers. We know that
+# Experiment with the basic SKLearn preprocessing scalers. We know that
 # the features consist of different units mixed in together, so it's reasonable
 # to assume feature scaling is necessary. Print out a description of the
 # dataset, post transformation.
 #
-# .. your code here ..
+from sklearn import preprocessing
+T = preprocessing.normalize(X)
 
 
 #
-# TODO: Do train_test_split. Use the same variable names as on the EdX platform in
+# Do train_test_split. Use the same variable names as on the EdX platform in
 # the reading material, but set the random_state=7 for reproduceability, and keep
 # the test_size at 0.33 (33%).
 #
-# .. your code here ..
+from sklearn.cross_validation import train_test_split
+data_train, data_test, label_train, label_test = train_test_split(T, y, test_size = 0.33, random_state = 7)
 
 
 
@@ -99,40 +110,46 @@ model = None
 if Test_PCA:
   print "Computing 2D Principle Components"
   #
-  # TODO: Implement PCA here. save your model into the variable 'model'.
+  # Implement PCA here. save your model into the variable 'model'.
   # You should reduce down to two dimensions.
   #
-  # .. your code here ..
-  
+  from sklearn.decomposition import PCA
+  model = PCA(n_components=2)
+
+
 
 else:
   print "Computing 2D Isomap Manifold"
   #
-  # TODO: Implement Isomap here. save your model into the variable 'model'
+  # Implement Isomap here. save your model into the variable 'model'
   # Experiment with K values from 5-10.
   # You should reduce down to two dimensions.
   #
-  # .. your code here ..
-
+  from sklearn import manifold
+  model = manifold.Isomap(n_neighbors=6, n_components=2)
 
 
 #
-# TODO: Train your model against data_train, then transform both
+# Train your model against data_train, then transform both
 # data_train and data_test using your model. You can save the results right
 # back into the variables themselves.
 #
-# .. your code here ..
+model.fit(data_train)
+data_train = model.transform(data_train)
+data_test = model.transform(data_test)
 
 
 # 
-# TODO: Implement and train KNeighborsClassifier on your projected 2D
+# Implement and train KNeighborsClassifier on your projected 2D
 # training data here. You can use any K value from 1 - 15, so play around
 # with it and see what results you can come up. Your goal is to find a
 # good balance where you aren't too specific (low-K), nor are you too
 # general (high-K). You should also experiment with how changing the weights
 # parameter affects the results.
 #
-# .. your code here ..
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors = 4, weights = 'distance')
+knn.fit(data_train, label_train)
 
 #
 # INFO: Be sure to always keep the domain of the problem in mind! It's
@@ -149,9 +166,9 @@ else:
 #
 # TODO: Calculate + Print the accuracy of the testing set
 #
-# .. your code here ..
+print knn.score(data_test, label_test)
 
 
-plotDecisionBoundary(model, data_test, label_test)
+plotDecisionBoundary(knn, data_test, label_test)
 
 
