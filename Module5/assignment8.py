@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 
 matplotlib.style.use('ggplot') # Look Pretty
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module5')
+
 
 def drawLine(model, X_test, y_test, title):
   # This convenience method will take care of plotting your
@@ -28,61 +31,69 @@ def drawLine(model, X_test, y_test, title):
 
 
 #
-# TODO: Load up the data here into a variable called 'X'.
+# Load up the data here into a variable called 'X'.
 # As usual, do a .describe and a print of your dataset and
 # compare it to the dataset loaded in a text file or in a
 # spread sheet application
 #
-# .. your code here ..
+X = pd.read_csv('Datasets/life_expectancy.csv', delim_whitespace = True)
+print X
+print X.describe()
 
 
 #
-# TODO: Create your linear regression model here and store it in a
+# Create your linear regression model here and store it in a
 # variable called 'model'. Don't actually train or do anything else
 # with it yet:
 #
-# .. your code here ..
+from sklearn import linear_model
+model = linear_model.LinearRegression()
 
 
 
 #
-# TODO: Slice out your data manually (e.g. don't use train_test_split,
+# Slice out your data manually (e.g. don't use train_test_split,
 # but actually do the Indexing yourself. Set X_train to be year values
 # LESS than 1986, and y_train to be corresponding WhiteMale age values.
 #
 # INFO You might also want to read the note about slicing on the bottom
 # of this document before proceeding.
 #
-# .. your code here ..
+X_train = X.Year[X.Year < 1986]
+y_train = X.WhiteMale[X.Year < 1986]
+X_train = X_train.to_frame()
 
 
 
 #
-# TODO: Train your model then pass it into drawLine with your training
+# Train your model then pass it into drawLine with your training
 # set and labels. You can title it "WhiteMale". drawLine will output
 # to the console a 2014 extrapolation / approximation for what it
 # believes the WhiteMale's life expectancy in the U.S. will be...
 # given the pre-1986 data you trained it with. It'll also produce a
 # 2030 and 2045 extrapolation.
 #
-# .. your code here ..
-
+model.fit(X_train, y_train)
+drawLine(model, X_train, y_train, "WhiteMale")
 
 #
-# TODO: Print the actual 2014 WhiteMale life expectancy from your
+# Print the actual 2014 WhiteMale life expectancy from your
 # loaded dataset
 #
-# .. your code here ..
+print "Actual 2014 WhiteMale life expectancy:", X.WhiteMale[(X.Year == 2014)].values[0]
 
 
 
 # 
-# TODO: Repeat the process, but instead of for WhiteMale, this time
+# Repeat the process, but instead of for WhiteMale, this time
 # select BlackFemale. Create a slice for BlackFemales, fit your
 # model, and then call drawLine. Lastly, print out the actual 2014
 # BlackFemale life expectancy
 #
-# .. your code here ..
+y_train2 = X.BlackFemale[X.Year < 1986]
+model2 = model.fit(X_train, y_train2)
+drawLine(model2, X_train, y_train2, "BlackFemale")
+print "Actual 2014 BlackFemale life expectancy", X.BlackFemale[(X.Year == 2014)].values[0]
 
 
 
@@ -92,7 +103,12 @@ def drawLine(model, X_test, y_test, title):
 # matrix, just as we described in the visualization section of
 # the course
 #
-# .. your code here ..
+print X.corr()
+plt.imshow(X.corr(), cmap=plt.cm.Blues, interpolation='nearest')
+plt.colorbar()
+tick_marks = [i for i in range(len(X.columns))]
+plt.xticks(tick_marks, X.columns, rotation='vertical')
+plt.yticks(tick_marks, X.columns)
 
 plt.show()
 
