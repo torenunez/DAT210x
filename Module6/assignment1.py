@@ -5,13 +5,15 @@ import pandas as pd
 import numpy as np 
 import time
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module6')
 
 # 
 # INFO: Your Parameters.
 # You can adjust them after completing the lab
 C = 1
 kernel = 'linear'
-iterations = 5000   # TODO: Change to 200000 once you get to Question#2
+iterations = 200000   # TODO: Change to 200000 once you get to Question#2
 
 #
 # INFO: You can set this to false if you want to
@@ -96,29 +98,29 @@ def benchmark(model, wintitle='Figure 1'):
   s = time.time()
   for i in range(iterations):
     #
-    # TODO: train the classifier on the training data / labels:
-    #
-    # .. your code here ..
+    # train the classifier on the training data / labels:
+    m = model.fit(X_train, y_train)
   print "{0} Iterations Training Time: ".format(iterations), time.time() - s
 
 
   s = time.time()
   for i in range(iterations):
     #
-    # TODO: score the classifier on the testing data / labels:
+    # score the classifier on the testing data / labels:
     #
-    # .. your code here ..
+    score = m.score(X_test, y_test)
   print "{0} Iterations Scoring Time: ".format(iterations), time.time() - s
   print "High-Dimensionality Score: ", round((score*100), 3)
 
 
 
 # 
-# TODO: Load up the wheat dataset into dataframe 'X'
+# Load up the wheat dataset into dataframe 'X'
 # Verify you did it properly.
 # Indices shouldn't be doubled, nor weird headers...
 #
-# .. your code here ..
+X = pd.read_csv('Datasets/wheat.data', index_col = 0)
+print X.head()
 
 
 # INFO: An easy way to show which rows have nans in them
@@ -126,9 +128,9 @@ def benchmark(model, wintitle='Figure 1'):
 
 
 # 
-# TODO: Go ahead and drop any row with a nan
+# Go ahead and drop any row with a nan
 #
-# .. your code here ..
+X.dropna(axis = 0, how = 'any', inplace = True)
 
 
 
@@ -141,20 +143,24 @@ def benchmark(model, wintitle='Figure 1'):
 
 
 #
-# TODO: Copy the labels out of the dset into variable 'y' then Remove
+# Copy the labels out of the dset into variable 'y' then Remove
 # them from X. Encode the labels, using the .map() trick we showed
 # you in Module 5 -- canadian:0, kama:1, and rosa:2
 #
-# .. your code here ..
+y = X.wheat_type
+X.drop('wheat_type', axis = 1, inplace = True)
+print X.head()
+y = y.map({'canadian': 0, 'kama': 1, 'rosa': 2})
 
 
 
 # 
-# TODO: Split your data into test / train sets
+# Split your data into test / train sets
 # Your test size can be 30% with random_state 7.
 # Use variable names: X_train, X_test, y_train, y_test
 #
-# .. your code here ..
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 7)
 
 
 
@@ -162,14 +168,15 @@ def benchmark(model, wintitle='Figure 1'):
 # TODO: Create an SVC classifier named svc
 # Use a linear kernel, and set the C value to C
 #
-# .. your code here ..
+from sklearn.svm import SVC
+svc = SVC(C = C, kernel = kernel)
 
 
 #
 # TODO: Create an KNeighbors classifier named knn
 # Set the neighbor count to 5
-#
-# .. your code here ..
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors = 5)
 
 
 

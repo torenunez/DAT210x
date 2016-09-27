@@ -7,6 +7,8 @@ import pandas as pd
 # At face value, this looks like an easy lab;
 # But it has many parts to it, so prepare yourself before starting...
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module6')
 
 def load(path_test, path_train):
   # Load up the data.
@@ -80,8 +82,8 @@ def drawPredictions():
 
 
 #
-# TODO: Pass in the file paths to the .tes and the .tra files
-X_train, X_test, y_train, y_test = load('', '')
+# Pass in the file paths to the .tes and the .tra files
+X_train, X_test, y_train, y_test = load('Datasets/optdigits.tes', 'Datasets/optdigits.tra')
 
 import matplotlib.pyplot as plt
 from sklearn import svm
@@ -94,20 +96,23 @@ peekData()
 
 
 #
-# TODO: Create an SVC classifier. Leave C=1, but set gamma to 0.001
+# Create an SVC classifier. Leave C=1, but set gamma to 0.001
 # and set the kernel to linear. Then train the model on the testing
 # data / labels:
 print "Training SVC Classifier..."
 #
-# .. your code here ..
+from sklearn.svm import SVC
+model = SVC(C = 2, gamma = 0.001, kernel = 'rbf')
+model.fit(X_train, y_train)
 
 
 
 
-# TODO: Calculate the score of your SVC against the testing data
+
+# Calculate the score of your SVC against the testing data
 print "Scoring SVC Classifier..."
 #
-# .. your code here ..
+score = model.score(X_test, y_test)
 print "Score:\n", score
 
 
@@ -116,31 +121,32 @@ drawPredictions()
 
 
 #
-# TODO: Print out the TRUE value of the 1000th digit in the test set
+# Print out the TRUE value of the 1000th digit in the test set
 #
-# .. your code here ..
-print "1000th test label: ", true_1000th_test_value)
+true_1000th_test_value = y_test[1000]
+print "1000th test label: ", true_1000th_test_value
 
 
 #
-# TODO: Predict the value of the 1000th digit in the test set.
+# Predict the value of the 1000th digit in the test set.
 # Was your model's prediction correct?
 # INFO: If you get a warning on your predict line, look at the
 # notes from the previous module's labs.
 #
-# .. your code here ..
+y_pred = model.predict(X_test)
+guess_1000th_test_value = y_pred[1000]
 print "1000th test prediction: ", guess_1000th_test_value
 
 
 #
-# TODO: Use IMSHOW to display the 1000th test image, so you can
+# Use IMSHOW to display the 1000th test image, so you can
 # visually check if it was a hard image, or an easy image
 #
-# .. your code here ..
+plt.imshow(X_test.ix[1000, :].reshape(8, 8), cmap = plt.cm.gray_r, interpolation = 'nearest')
 
 
 #
-# TODO: Were you able to beat the USPS advertised accuracy score
+# Were you able to beat the USPS advertised accuracy score
 # of 98%? If so, STOP and answer the lab questions. But if you
 # weren't able to get that high of an accuracy score, go back
 # and change your SVC's kernel to 'poly' and re-run your lab
@@ -149,7 +155,7 @@ print "1000th test prediction: ", guess_1000th_test_value
 
 
 #
-# TODO: Were you able to beat the USPS advertised accuracy score
+# Were you able to beat the USPS advertised accuracy score
 # of 98%? If so, STOP and answer the lab questions. But if you
 # weren't able to get that high of an accuracy score, go back
 # and change your SVC's kernel to 'rbf' and re-run your lab
@@ -158,7 +164,7 @@ print "1000th test prediction: ", guess_1000th_test_value
 
 
 #
-# TODO: Were you able to beat the USPS advertised accuracy score
+# Were you able to beat the USPS advertised accuracy score
 # of 98%? If so, STOP and answer the lab questions. But if you
 # weren't able to get that high of an accuracy score, go back
 # and tinker with your gamma value and C value until you're able
