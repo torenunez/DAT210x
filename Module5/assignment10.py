@@ -29,10 +29,11 @@ import scipy.io.wavfile as wavfile
 # and have the computer generate using the Provided_Portion parameter.
 
 
-
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module5')
 
 #
-# TODO: Play with this. This is how much of the audio file will
+# Play with this. This is how much of the audio file will
 # be provided, in percent. The remaining percent of the file will
 # be generated via linear extrapolation.
 Provided_Portion = 0.25
@@ -45,17 +46,23 @@ Provided_Portion = 0.25
 
 
 #
-# TODO: Create a regular ol' Python List called 'zero'
+# Create a regular ol' Python List called 'zero'
 # Loop through the dataset and load up all 50 of the 0_jackson*.wav files
 # For each audio file, simply append the audio data (not the sample_rate,
 # just the data!) to your Python list 'zero':
 #
-# .. your code here ..
+zero = []
+for file in os.listdir('Datasets/recordings'):
+    if file.startswith('0_jackson'):
+        a = os.path.join('Datasets/recordings', file)
+        sample_rate, audio_data = wavfile.read(a)
+        zero.append(audio_data)
+print len(zero)
 
 
 
 # 
-# TODO: Just for a second, convert zero into a DataFrame. When you do
+# Just for a second, convert zero into a DataFrame. When you do
 # so, set the dtype to np.int16, since the input audio files are 16
 # bits per sample. If you don't know how to do this, read up on the docs
 # here:
@@ -68,25 +75,33 @@ Provided_Portion = 0.25
 # do a dropna on the Y axis here. Then, convert one back into an
 # NDArray using .values
 #
-# .. your code here ..
+zero = pd.DataFrame(data = zero, dtype = np.int16)
+print type(zero)
+print zero.shape
+zero.dropna(axis = 1, inplace = True)
+print zero.shape
+zero = zero.values
+print type(zero)
 
 
 #
-# TODO: It's important to know how (many audio_samples samples) long the
+# It's important to know how (many audio_samples samples) long the
 # data is now. 'zero' is currently shaped [n_samples, n_audio_samples],
 # so get the n_audio_samples count and store it in a variable called
 # n_audio_samples
 #
-# .. your code here ..
+n_audio_samples = zero.shape[1]
+print n_audio_samples
 
 
 
 #
-# TODO: Create your linear regression model here and store it in a
+# Create your linear regression model here and store it in a
 # variable called 'model'. Don't actually train or do anything else
 # with it yet:
 #
-# .. your code here ..
+from sklearn import linear_model
+model = linear_model.LinearRegression()
 
 
 
@@ -105,13 +120,13 @@ train = np.delete(zero, [random_idx], axis=0)
 
 
 # 
-# TODO: Print out the shape of train, and the shape of test
+# Print out the shape of train, and the shape of test
 # train will be shaped: [n_samples, n_audio_samples], where
 # n_audio_samples are the 'features' of the audio file
 # train will be shaped [n_audio_features], since it is a single
 # sample (audio file, e.g. observation).
 #
-# .. your code here ..
+print "Shapes of train and test, respectively:", train.shape, test.shape
 
 
 
@@ -135,29 +150,29 @@ wavfile.write('Original Test Clip.wav', sample_rate, test)
 
 
 #
-# TODO: Prepare the TEST date by creating a slice called X_test. It
+# Prepare the TEST date by creating a slice called X_test. It
 # should have Provided_Portion * n_audio_samples audio sample features,
 # taken from your test audio file, currently stored in the variable
 # 'test'. In other words, grab the FIRST Provided_Portion *
 # n_audio_samples audio features from test and store it in X_test.
 #
-# .. your code here ..
+X_test = test[:int(Provided_Portion*n_audio_samples)]
 
 
 #
-# TODO: If the first Provided_Portion * n_audio_samples features were
+# If the first Provided_Portion * n_audio_samples features were
 # stored in X_test, then we need to also grab the *remaining* audio
 # features and store it in y_test. With the remaining features stored
 # in there, we will be able to R^2 "score" how well our algorithm did
 # in completing the sound file.
 #
-# .. your code here ..
+y_test = test[int(Provided_Portion*n_audio_samples):]
 
 
 
 
 # 
-# TODO: Duplicate the same process for X_train, y_train. The only
+# Duplicate the same process for X_train, y_train. The only
 # differences being: 1) Your will be getting your audio data from
 # 'train' instead of from 'test', 2) Remember the shape of train that
 # you printed out earlier? You want to do this slicing but for ALL
@@ -166,12 +181,13 @@ wavfile.write('Original Test Clip.wav', sample_rate, test)
 # X_train, and the remaining go into y_test. All of this should be
 # accomplishable using regular indexing in two lines of code.
 #
-# .. your code here ..
+X_train = train[:, :int(Provided_Portion*n_audio_samples)]
+y_train = train[:, int(Provided_Portion*n_audio_samples):]
 
 
 
 # 
-# TODO: SciKit-Learn gets mad if you don't supply your training
+# SciKit-Learn gets mad if you don't supply your training
 # data in the form of a 2D arrays: [n_samples, n_features].
 #
 # So if you only have one SAMPLE, such as is our case with X_test, 
@@ -182,20 +198,21 @@ wavfile.write('Original Test Clip.wav', sample_rate, test)
 # doesn't apply, you can call .reshape(-1, 1) on your data to turn
 # [n_samples] into [n_samples, 1]:
 #
-# .. your code here ..
+X_test = X_test.reshape(1, -1)
+y_test = y_test.reshape(1, -1)
 
 
 #
-# TODO: Fit your model using your training data and label:
+# Fit your model using your training data and label:
 #
-# .. your code here ..
+model.fit(X_train, y_train)
 
 
 # 
-# TODO: Use your model to predict the 'label' of X_test. Store the
+# Use your model to predict the 'label' of X_test. Store the
 # resulting prediction in a variable called y_test_prediction
 #
-# .. your code here ..
+y_test_prediction = model.predict(X_test)
 
 
 # INFO: SciKit-Learn will use float64 to generate your predictions
@@ -205,10 +222,10 @@ y_test_prediction = y_test_prediction.astype(dtype=np.int16)
 
 
 # 
-# TODO: Score how well your prediction would do for some good laughs,
+# Score how well your prediction would do for some good laughs,
 # by passing in your test data and test label (y_test).
 #
-# .. your code here ..
+score = model.score(X_test, y_test)
 print "Extrapolation R^2 Score: ", score
 
 
