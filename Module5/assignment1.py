@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.style.use('ggplot') # Look Pretty
 
 import os
-os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module5')
 
 #
 # To procure the dataset, follow these steps:

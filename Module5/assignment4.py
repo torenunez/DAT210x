@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
+from sklearn.cluster import KMeans
 from sklearn import preprocessing
 
 import matplotlib.pyplot as plt
 import matplotlib
 
-import os
-os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
+#import os
+#os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
 #
 
 #

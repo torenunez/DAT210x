@@ -6,8 +6,8 @@ import matplotlib
 
 matplotlib.style.use('ggplot') # Look Pretty
 
-import os
-os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
+# import os
+# os.chdir('/Users/torenunez/PycharmProjects/DAT210x/Module5')
 #
 # INFO: This dataset has call records for 10 users tracked over the course of 3 years.
 # Your job is to find out where the users likely live at!

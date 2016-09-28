@@ -165,7 +165,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, rando
 
 
 #
-# TODO: Create an SVC classifier named svc
+# Create an SVC classifier named svc
 # Use a linear kernel, and set the C value to C
 #
 from sklearn.svm import SVC
@@ -173,7 +173,7 @@ svc = SVC(C = C, kernel = kernel)
 
 
 #
-# TODO: Create an KNeighbors classifier named knn
+# Create an KNeighbors classifier named knn
 # Set the neighbor count to 5
 from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors = 5)
