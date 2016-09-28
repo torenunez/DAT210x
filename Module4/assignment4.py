@@ -3,6 +3,9 @@ import numpy as np
 import scipy.io
 import random, math
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module4')
+
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
