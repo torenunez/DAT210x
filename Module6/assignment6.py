@@ -5,25 +5,28 @@ import time
 # http://groupware.les.inf.puc-rio.br/har
 # http://groupware.les.inf.puc-rio.br/static/har/dataset-har-PUC-Rio-ugulino.zip
 
+import os
+os.chdir('C:/Users/Salvador.Nunez/GitHub/DAT210x/Module6')
 
 #
-# TODO: Load up the dataset into dataframe 'X'
+# Load up the dataset into dataframe 'X'
 #
-# .. your code here ..
+X = pd.read_csv('Datasets/dataset-har-PUC-Rio-ugulino.csv', sep = ';', decimal = ',')
+print X.head()
 
-
-
-#
-# TODO: Encode the gender column, 0 as male, 1 as female
-#
-# .. your code here ..
 
 
 #
-# TODO: Clean up any column with commas in it
+# Encode the gender column, 0 as male, 1 as female
+#
+X.gender = X.gender.map({'Man': 0, 'Woman': 1})
+print X.head()
+
+
+#
+# Clean up any column with commas in it
 # so that they're properly represented as decimals instead
 #
-# .. your code here ..
 
 
 #
@@ -33,28 +36,34 @@ print X.dtypes
 
 
 #
-# TODO: Convert any column that needs to be converted into numeric
+# Convert any column that needs to be converted into numeric
 # use errors='raise'. This will alert you if something ends up being
 # problematic
 #
-# .. your code here ..
 
-
-#
 # INFO: If you find any problematic records, drop them before calling the
 # to_numeric methods above...
+bad_indices = []
+for i, item in enumerate(X['z4']):
+   try:
+      int(item)
+   except ValueError:
+       bad_indices.append(i)
+       print('ERROR at index {}: {!r}'.format(i, item))
 
+X.drop(X.index[bad_indices], inplace=True)
+X.z4 = pd.to_numeric(X.z4, errors='raise')
 
 #
-# TODO: Encode your 'y' value as a dummies version of your dataset's "class" column
+# Encode your 'y' value as a dummies version of your dataset's "class" column
 #
-# .. your code here ..
+y = X[['class']]
+y = pd.get_dummies(y)
 
-
 #
-# TODO: Get rid of the user and class columns
+# Get rid of the user and class columns
 #
-# .. your code here ..
+X.drop(labels = ['user', 'class'], axis=1, inplace=True)
 print X.describe()
 
 
@@ -65,19 +74,22 @@ print X[pd.isnull(X).any(axis=1)]
 
 
 #
-# TODO: Create an RForest classifier 'model' and set n_estimators=30,
+# Create an RForest classifier 'model' and set n_estimators=30,
 # the max_depth to 10, and oob_score=True, and random_state=0
 #
-# .. your code here ..
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier(n_estimators=30, max_depth=10, oob_score=True, random_state=0)
 
 
 
 # 
-# TODO: Split your data into test / train sets
+# Split your data into test / train sets
 # Your test size can be 30% with random_state 7
 # Use variable names: X_train, X_test, y_train, y_test
 #
-# .. your code here ..
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=7)
 
 
 
@@ -86,9 +98,9 @@ print X[pd.isnull(X).any(axis=1)]
 print "Fitting..."
 s = time.time()
 #
-# TODO: train your model on your training set
+#train your model on your training set
 #
-# .. your code here ..
+model.fit(X_train, y_train)
 print "Fitting completed in: ", time.time() - s
 
 
@@ -103,9 +115,9 @@ print "OOB Score: ", round((score*100), 3)
 print "Scoring..."
 s = time.time()
 #
-# TODO: score your model on your test set
+# score your model on your test set
 #
-# .. your code here ..
+score = model.score(X_test, y_test)
 print "Score: ", round((score*100), 3)
 print "Scoring completed in: ", time.time() - s
 
